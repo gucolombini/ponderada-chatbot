@@ -1,5 +1,8 @@
 ## CHATBOT DUNDER MIFFLIN
 
+### Vídeo demonstração
+WIP
+
 ### Pré-requisitos:
 - Python 3
 - Ollama
