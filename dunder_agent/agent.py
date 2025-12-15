@@ -5,6 +5,7 @@ from vector_transactions import retriever as transactions_retriever
 from vector_compliance import retriever as compliance_retriever
 from vector_compliance import sanctions as compliance_sanctions
 from vector_emails import retriever as emails_retriever
+from pipeline_conspiracy import retriever as conspiracy_retriever
 from router import retrieve as router_retrieve
 
 
@@ -30,7 +31,7 @@ LEVE OS EMAILS MUITO A SÉRIO! ELES SÃO EVIDÊNCIAS IMPORTANTES! Se houverem ev
 Nome do usuário: {user_name}
 Pergunta do usuário: {question}
 Transações possivelmente relevantes: {transactions}
-Políticas de conformidade possivelmente relevantes: {compliance_info}
+Políticas de conformidade possivelmente relevantes: {compliance}
 Sanções possivelmente relevantes: {sanctions}
 Emails possivelmente relevantes: {emails}
 
@@ -47,27 +48,37 @@ while True:
     question = input("(DUNDER AGENT) Faça sua pergunta (ou 'q' para sair): ")
     if question.lower() == 'q':
         break
-    
+
+    transactions = []
+    compliance = []
+    sanctions = []
+    emails = []
+
     router_decision = router_retrieve(question)
 
-    transactions = "Nenhuma"
-    compliance_info = "Nenhuma"
-    sanctions = "Nenhuma"
-    emails = "Nenhum"
-
     if (router_decision) == "fail":
-        print("Routing failed. Please try again.")
-        continue
-    if router_decision["needs_compliance"]:
-        compliance_info = compliance_retriever(question, 3)
-    if router_decision["needs_transactions"]:
-        transactions = transactions_retriever(question, 10)
-    if router_decision["needs_sanctions"]:
-        sanctions = compliance_sanctions
-    if router_decision["needs_emails"]:
-        emails = emails_retriever(question, 3)
-        
+        print("Roteamento falhou!")
 
-    result = chain.invoke({"user_name": username, "question": question, "transactions": transactions, "compliance_info": compliance_info, "sanctions": sanctions, "emails": emails})
+    elif router_decision["requires"] == "compliance":
+        compliance = compliance_retriever(router_decision["prompt"], 3)
+
+    elif router_decision["requires"] == "sanctions":
+        print("Fetching sanctions info...\n")
+        sanctions = compliance_sanctions
+
+    elif router_decision["requires"] == "emails":
+        print("Fetching email info...\n")
+        emails = emails_retriever(router_decision["prompt"], 3)
+
+    elif router_decision["requires"] == "conspiracy":
+        print("CONSPIRACY PIPELINE INITIATED...\n")
+        response = conspiracy_retriever(question)
+        emails = response["emails"]
+        compliance = response["compliance"]
+    
+    elif router_decision["required"] == "fraud":
+        print("FRAUD PIPELINE INITIATED...\n")
+
+    result = chain.invoke({"user_name": username, "question": question, "transactions": transactions, "compliance": compliance, "sanctions": sanctions, "emails": emails})
     print(result)
     print("\n" + result.content)

@@ -12,24 +12,23 @@ model = ChatGroq(
 )
 
 template = """
-You are a classifier.
+Você é um agente roteador para um chatbot assistente de uma empresa.
 
-Decide whether the user's question requires:
-- bank transaction data
-- compliance policy information
-- sanctions information (responses for violations of policies)
-- email data
-If a question is related to investigating employees, it will more likely need emails.
+Baseado na pergunta, escolha qual desses deve ser buscado:
+- política de conformidade
+- sanções (se houver violações)
+- busca básica de emails
+- pipeline de investigação - fraude
+- pipeline de investigação - conspiração
+E crie um prompt simples (<10 palavras) para ajudar o próximo agente.
 
-Return ONLY valid JSON in this format:
+Retorne APENAS json válido nesse formato:
 {{
-    "transactions": true/false,
-    "compliance": true/false,
-    "sanctions": true/false,
-    "emails": true/false
+    "requires": "compliance", "sanctions", "fraud", "conspiracy", "emails" ou "none"
+    "prompt": "<seu prompt aqui>"
 }}
 
-Question: {question}
+Pergunta: {question}
 """
 
 prompt = ChatPromptTemplate.from_template(template)
@@ -43,15 +42,11 @@ def retrieve(question: str):
     except json.JSONDecodeError:
         return "fail"
 
-    needs_transactions = routing.get("transactions", False)
-    needs_compliance = routing.get("compliance", False)
-    needs_sanctions = routing.get("sanctions", False)
-    needs_emails = routing.get("emails", False)
+    requires = routing.get("requires", False)
+    prompt = routing.get("prompt", False)
     response = {
-        "needs_transactions": needs_transactions,
-        "needs_compliance": needs_compliance,
-        "needs_sanctions": needs_sanctions,
-        "needs_emails": needs_emails
+        "requires": requires,
+        "prompt": prompt
     }
 
     return response

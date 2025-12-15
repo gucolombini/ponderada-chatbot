@@ -18,13 +18,11 @@ if add_documents:
     for i, row in df.iterrows():
 
         page_content = f"""
-            Transação {row['id_transacao']} realizada em {row['data']}.
-            funcionario: {row['funcionario']}
+            funcionario: {row['funcionario']}.
             cargo: {row['cargo']}.
             departamento {row['departamento']}.
             Categoria: {row['categoria']}.
             Descrição: {row['descricao']}.
-            Valor: R$ {row['valor']}.
             """.strip()
 
         document = Document(
@@ -32,12 +30,7 @@ if add_documents:
             metadata={
                 "id_transacao": row["id_transacao"],
                 "data": row["data"],
-                "funcionario": row["funcionario"],
-                "cargo": row["cargo"],
-                "descricao": row["descricao"],
                 "valor": row["valor"],
-                "categoria": row["categoria"],
-                "departamento": row["departamento"],
             },
             id=str(i)
         )

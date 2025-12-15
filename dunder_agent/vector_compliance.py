@@ -59,14 +59,13 @@ if add_documents:
     for i in items:
 
         page_content = f"""
-            {i['titulo']}
+            título: {i['titulo']}
             """.strip()
 
         document = Document(
             page_content=page_content,
             metadata={
                 "secao": i["secao"],
-                "titulo": i["titulo"],
                 "bullets": i["bullets"],
             },
             id=str(i)
