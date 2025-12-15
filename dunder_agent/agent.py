@@ -21,28 +21,26 @@ model = ChatGroq(
 
 template = """
 Você é um assistente virtual que deve responder perguntas relacionadas à empresa.
-A Dunder Mifflin ("A Empresa") preza por um ambiente de trabalho profissional, livre de distrações, brincadeiras perigosas e fraudes financeiras. Este manual substitui todas as diretrizes anteriores (incluindo o memorando "Vamos nos divertir" distribuído pelo Gerente Regional em 2006). O objetivo destas regras é garantir a solvência financeira da filial de Scranton e evitar processos judiciais.
+A Dunder Mifflin ("A Empresa") preza por um ambiente de trabalho profissional, livre de distrações, brincadeiras perigosas e fraudes financeiras.
 O dinheiro da empresa deve ser utilizado estritamente para fins comerciais: a venda de papel e produtos de escritório.
-Você pode receber algumas transações bancárias, políticas de conformidade ou até emails de funcionários para ajudá-lo a responder. Especifique qual política, transação ou email você está usando para fundamentar sua resposta.
-Se a pergunta do usuário não estiver relacionada à empresa, transações bancárias ou políticas de conformidade, informe politicamente que você só pode responder perguntas relacionadas a esses tópicos.
-LEVE OS EMAILS MUITO A SÉRIO! ELES SÃO EVIDÊNCIAS IMPORTANTES! Se houverem evidências de atitudes anti-éticas, ilegais ou que violem as políticas da empresa, destaque-as na sua resposta e cite as evidências.
-Se não usar uma informação, não precisa falar dela, tente ser conciso.
+Você pode receber algumas transações bancárias, políticas de conformidade ou até emails de funcionários para ajudá-lo a responder. Especifique qual política, transação ou email você está usando para fundamentar sua resposta (se houver, senão ignore).
+Se a pergunta do usuário não estiver relacionada à empresa, transações bancárias ou políticas de conformidade, informe que você só pode responder perguntas relacionadas a esses tópicos.
+Especifique os IDs de transações caso usar.
+Se a pergunta for sobre fraude, você pode tentar correlacionar as transações e os emails.
+Providencie uma resposta clara e concisa para o usuário com base nas informações acima.
+Não gaste muitos tokens, eles custam caro!
 
-Nome do usuário: {user_name}
 Pergunta do usuário: {question}
 Transações possivelmente relevantes: {transactions}
 Políticas de conformidade possivelmente relevantes: {compliance}
 Sanções possivelmente relevantes: {sanctions}
 Emails possivelmente relevantes: {emails}
-
-Providencie uma resposta clara e concisa para o usuário com base nas informações acima.
-Não gaste muitos tokens, eles custam caro!
 """
 
 prompt = ChatPromptTemplate.from_template(template)
 chain = prompt | model
+print("Olá, eu sou o Dunder Agent, e estou aqui para te ajudar com qualquer dúvida ou questão que você tiver sobre a empresa!")
 
-username = input("Digite seu nome: ")
 
 while True:
     question = input("(DUNDER AGENT) Faça sua pergunta (ou 'q' para sair): ")
@@ -65,6 +63,11 @@ while True:
         compliance = response["compliance"]
         transactions = response["transactions"]
         emails = response["emails"]
+    elif router_decision["needs_conspiracy"]:
+        response = retrieve_conspiracy(question)
+        compliance = response["compliance"]
+        emails = response["emails"]
+
     else: 
         if router_decision["needs_compliance"]:
             compliance = compliance_retriever(question, 3)
@@ -76,6 +79,5 @@ while True:
             emails = emails_retriever(question, 3)
         
 
-    result = chain.invoke({"user_name": username, "question": question, "transactions": transactions, "compliance": compliance, "sanctions": sanctions, "emails": emails})
-    print(result)
+    result = chain.invoke({"question": question, "transactions": transactions, "compliance": compliance, "sanctions": sanctions, "emails": emails})
     print("\n" + result.content)

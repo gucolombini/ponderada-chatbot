@@ -64,12 +64,8 @@ if add_documents:
         document = Document(
             page_content=page_content,
             metadata={
-                "titulo": i["assunto"],
-                "remetente": i["remetente"],
                 "destinatario": i["destinatario"],
                 "data": i["data"],
-                "assunto": i["assunto"],
-                "mensagem": i["mensagem"]
             },
             id=str(i)
         )
@@ -87,4 +83,8 @@ print("Loading from "+db_location+"\n")
 faiss_load = FAISS.load_local(db_location, embeddings, allow_dangerous_deserialization=True)
 
 def retriever(query: str, k: int = 5):
-    return faiss_load.similarity_search(query, k)
+    response = faiss_load.similarity_search(query, k)
+    emails = []
+    for r in response:
+        emails.append(r.page_content)
+    return emails

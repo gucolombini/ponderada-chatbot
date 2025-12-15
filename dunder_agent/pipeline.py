@@ -3,7 +3,6 @@ from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from vector_transactions import retriever as transactions_retriever
 from vector_compliance import retriever as compliance_retriever
-from vector_compliance import sanctions as compliance_sanctions
 from vector_emails import retriever as emails_retriever
 import json
 
@@ -16,9 +15,9 @@ model = ChatGroq(
 )
 
 template_transaction = """
-Você deve construir um prompt para busca de transações ilegítimas em uma Vector Database.
-O prompt deve ser simples e conciso, mas deve ser capaz de encontrar as transações relevantes.
-A base de dados inclui o nome dos funcionários, então pode usá-los no prompt.
+Você deve construir um prompt para busca de transações ilegítimas em uma Vector Database, construída sobre um simples csv de entradas e saídas.
+O prompt deve ser simples e conciso, mas deve ser capaz de encontrar as transações relevantes. "nome funcionário, tipo de transação, destino do dinheiro, etc."
+Use informações dos emails para construir o prompt da busca.
 Retorne APENAS o prompt, para economizar tokens.
 
 Pergunta original: {question}
@@ -45,5 +44,13 @@ def retrieve_fraud(question: str):
     return response
 
 def retrieve_conspiracy(question: str):
-    return "brah"
+    emails = emails = emails_retriever(question, 4)
+    compliance = compliance_retriever(question, 2)
+
+    response = {
+        "emails": emails,
+        "compliance": compliance
+    }
+
+    return response
 

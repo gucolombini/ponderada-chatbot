@@ -15,13 +15,13 @@ template = """
 You are a classifier.
 
 Decide whether the user's question requires:
-- bank transaction data
+- transaction data
 - compliance policy information
-- sanctions information (responses for violations of policies)
+- sanctions information (consequence for violation of policies)
 - email data
 - further investigation using one of the pipelines (fraud or conspiracy)
 
-Return ONLY valid JSON in this format:
+Return ONLY valid JSON in this format (you may request more than one):
 {{
     "transactions": true/false,
     "compliance": true/false,

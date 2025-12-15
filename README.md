@@ -1,8 +1,17 @@
-## CHATBOT DUNDER MIFFLIN
+# CHATBOT DUNDER MIFFLIN
+
+Chatbot com implementação de RAG para responder perguntas do usuário usando dados relevantes de emails, transações, ou políticas de conformidade. Faz uso tanto de LLMs por API quanto LLMs locais para a criação e busca em bases de dados em vetores.
+
+Por padrão utiliza o modelo Llama 3.1 8B Instant via Groq para sintetização, BGE-M3 via Ollama para criação e busca de bases de dados em vetores (via FAISS db).
 
 ### Vídeo demonstração
 WIP
 
+## Arquitetura:
+![Arquitetura de busca simples](assets/diagram_simple.png "Arquitetura de busca simples")
+![Arquitetura de busca por fraude](assets/diagram_fraud.png "Arquitetura de busca por fraude")
+
+## Instruções de execução
 ### Pré-requisitos:
 - Python 3
 - Ollama
