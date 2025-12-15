@@ -19,14 +19,16 @@ Decide whether the user's question requires:
 - compliance policy information
 - sanctions information (responses for violations of policies)
 - email data
-If a question is related to investigating employees, it will more likely need emails.
+- further investigation using one of the pipelines (fraud or conspiracy)
 
 Return ONLY valid JSON in this format:
 {{
     "transactions": true/false,
     "compliance": true/false,
     "sanctions": true/false,
-    "emails": true/false
+    "emails": true/false,
+    "fraud": true/false,
+    "conspiracy": true/false
 }}
 
 Question: {question}
@@ -47,11 +49,15 @@ def retrieve(question: str):
     needs_compliance = routing.get("compliance", False)
     needs_sanctions = routing.get("sanctions", False)
     needs_emails = routing.get("emails", False)
+    needs_fraud = routing.get("fraud", False)
+    needs_conspiracy = routing.get("conspiracy", False)
     response = {
         "needs_transactions": needs_transactions,
         "needs_compliance": needs_compliance,
         "needs_sanctions": needs_sanctions,
-        "needs_emails": needs_emails
+        "needs_emails": needs_emails,
+        "needs_fraud": needs_fraud,
+        "needs_conspiracy": needs_conspiracy
     }
 
     return response

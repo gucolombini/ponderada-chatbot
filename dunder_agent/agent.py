@@ -5,6 +5,7 @@ from vector_transactions import retriever as transactions_retriever
 from vector_compliance import retriever as compliance_retriever
 from vector_compliance import sanctions as compliance_sanctions
 from vector_emails import retriever as emails_retriever
+from pipeline import retrieve_fraud, retrieve_conspiracy
 from router import retrieve as router_retrieve
 
 
@@ -23,14 +24,14 @@ Você é um assistente virtual que deve responder perguntas relacionadas à empr
 A Dunder Mifflin ("A Empresa") preza por um ambiente de trabalho profissional, livre de distrações, brincadeiras perigosas e fraudes financeiras. Este manual substitui todas as diretrizes anteriores (incluindo o memorando "Vamos nos divertir" distribuído pelo Gerente Regional em 2006). O objetivo destas regras é garantir a solvência financeira da filial de Scranton e evitar processos judiciais.
 O dinheiro da empresa deve ser utilizado estritamente para fins comerciais: a venda de papel e produtos de escritório.
 Você pode receber algumas transações bancárias, políticas de conformidade ou até emails de funcionários para ajudá-lo a responder. Especifique qual política, transação ou email você está usando para fundamentar sua resposta.
-Se as informações recebidas forem insuficientes para responder a pergunta, diga que não foi possível encontrar uma resposta com base na sua pesquisa.
 Se a pergunta do usuário não estiver relacionada à empresa, transações bancárias ou políticas de conformidade, informe politicamente que você só pode responder perguntas relacionadas a esses tópicos.
 LEVE OS EMAILS MUITO A SÉRIO! ELES SÃO EVIDÊNCIAS IMPORTANTES! Se houverem evidências de atitudes anti-éticas, ilegais ou que violem as políticas da empresa, destaque-as na sua resposta e cite as evidências.
+Se não usar uma informação, não precisa falar dela, tente ser conciso.
 
 Nome do usuário: {user_name}
 Pergunta do usuário: {question}
 Transações possivelmente relevantes: {transactions}
-Políticas de conformidade possivelmente relevantes: {compliance_info}
+Políticas de conformidade possivelmente relevantes: {compliance}
 Sanções possivelmente relevantes: {sanctions}
 Emails possivelmente relevantes: {emails}
 
@@ -51,23 +52,30 @@ while True:
     router_decision = router_retrieve(question)
 
     transactions = "Nenhuma"
-    compliance_info = "Nenhuma"
+    compliance = "Nenhuma"
     sanctions = "Nenhuma"
     emails = "Nenhum"
 
     if (router_decision) == "fail":
         print("Routing failed. Please try again.")
         continue
-    if router_decision["needs_compliance"]:
-        compliance_info = compliance_retriever(question, 3)
-    if router_decision["needs_transactions"]:
-        transactions = transactions_retriever(question, 10)
-    if router_decision["needs_sanctions"]:
-        sanctions = compliance_sanctions
-    if router_decision["needs_emails"]:
-        emails = emails_retriever(question, 3)
+
+    if router_decision["needs_fraud"]:
+        response = retrieve_fraud(question)
+        compliance = response["compliance"]
+        transactions = response["transactions"]
+        emails = response["emails"]
+    else: 
+        if router_decision["needs_compliance"]:
+            compliance = compliance_retriever(question, 3)
+        if router_decision["needs_transactions"]:
+            transactions = transactions_retriever(question, 10)
+        if router_decision["needs_sanctions"]:
+            sanctions = compliance_sanctions
+        if router_decision["needs_emails"]:
+            emails = emails_retriever(question, 3)
         
 
-    result = chain.invoke({"user_name": username, "question": question, "transactions": transactions, "compliance_info": compliance_info, "sanctions": sanctions, "emails": emails})
+    result = chain.invoke({"user_name": username, "question": question, "transactions": transactions, "compliance": compliance, "sanctions": sanctions, "emails": emails})
     print(result)
     print("\n" + result.content)
