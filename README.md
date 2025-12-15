@@ -4,8 +4,7 @@ Chatbot com implementação de RAG para responder perguntas do usuário usando d
 
 Por padrão utiliza o modelo Llama 3.1 8B Instant via Groq para sintetização, BGE-M3 via Ollama para criação e busca de bases de dados em vetores (via FAISS db).
 
-### Vídeo demonstração
-WIP
+### [Vídeo demonstração](https://drive.google.com/file/d/1ME4IzrIN0ZsU8k0Hy8ZX0eYmEoVoyxTP/view?usp=sharing)
 
 ## Arquitetura:
 ![Arquitetura de busca simples](assets/diagram_simple.png "Arquitetura de busca simples")
