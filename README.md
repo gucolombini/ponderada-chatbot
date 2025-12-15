@@ -10,6 +10,7 @@ WIP
 ## Arquitetura:
 ![Arquitetura de busca simples](assets/diagram_simple.png "Arquitetura de busca simples")
 ![Arquitetura de busca por fraude](assets/diagram_fraud.png "Arquitetura de busca por fraude")
+![Arquitetura de busca por conspiração](assets/diagram_conspiracy.png "Arquitetura de busca por conspiração")
 
 ## Instruções de execução
 ### Pré-requisitos:
