@@ -84,8 +84,6 @@ if add_documents:
 print("Loading from "+db_location+"\n")
 faiss_load = FAISS.load_local(db_location, embeddings, allow_dangerous_deserialization=True)
 
-print(faiss_load.similarity_search("Qual a política da empresa sobre ?", 1))
-
 def retriever(query: str, k: int = 5):
     return faiss_load.similarity_search(query, k)
 
